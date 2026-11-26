@@ -42,29 +42,25 @@ GCLOUD_PROJECT="$P" npm run seed -- --project
 
 echo "== Netlify environment"
 SITE_URL="$($NL api getSite --data "{\"site_id\":\"$NETLIFY_SITE_ID\"}" | node -e 'const s=JSON.parse(require("fs").readFileSync(0));console.log(s.ssl_url||s.url)')"
-setv() { $NL env:set "$1" "$2" --context production --force >/dev/null; echo "set $1"; }
-sets() { $NL env:set "$1" "$2" --context production --secret --force >/dev/null; echo "set $1 (secret)"; }
-setv APP_ENV staging
-setv IDENTITY_MODE disabled
-setv APP_BASE_URL "$SITE_URL"
-setv GCLOUD_PROJECT "$P"
-setv NEXT_PUBLIC_UPLOADS_ENABLED false
-setv NEXT_PUBLIC_FIREBASE_API_KEY "$(cfg apiKey)"
-setv NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN "$(cfg authDomain)"
-setv NEXT_PUBLIC_FIREBASE_PROJECT_ID "$P"
-setv NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET "$(cfg storageBucket)"
-setv NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID "$(cfg messagingSenderId)"
-setv NEXT_PUBLIC_FIREBASE_APP_ID "$APP_ID"
-sets FIREBASE_CLIENT_EMAIL "$(node -e 'console.log(require(process.argv[1]).client_email)' "$KEY_FILE")"
-sets FIREBASE_PRIVATE_KEY "$(node -e 'process.stdout.write(require(process.argv[1]).private_key.replace(/\n/g,"\\n"))' "$KEY_FILE")"
+# Values go to Netlify through stdin (scripts/netlify-env.mjs), never as command-line arguments, so they can't
+# show up in CI logs or error messages.
+export APP_ID P SITE_URL KEY_FILE SDK
+node -e '
+  const r=JSON.parse(process.env.SDK).result;const c=r.sdkConfig||(r.fileContents&&JSON.parse(r.fileContents))||r;
+  const k=JSON.parse(require("fs").readFileSync(process.env.KEY_FILE,"utf8"));
+  const v=(value,secret=false)=>({value,secret});
+  process.stdout.write(JSON.stringify({
+    APP_ENV:v("staging"),IDENTITY_MODE:v("disabled"),APP_BASE_URL:v(process.env.SITE_URL),GCLOUD_PROJECT:v(process.env.P),
+    NEXT_PUBLIC_UPLOADS_ENABLED:v("false"),NEXT_PUBLIC_FIREBASE_API_KEY:v(c.apiKey),NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:v(c.authDomain),
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID:v(process.env.P),NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET:v(c.storageBucket||""),
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:v(c.messagingSenderId||""),NEXT_PUBLIC_FIREBASE_APP_ID:v(process.env.APP_ID),
+    FIREBASE_CLIENT_EMAIL:v(k.client_email,true),FIREBASE_PRIVATE_KEY:v(k.private_key.replace(/\n/g,"\\n"),true)}));' \
+  | node scripts/netlify-env.mjs
 # Identity encryption keys: generated once, kept only in Netlify's secret store, never printed.
-for k in IDENTITY_ENCRYPTION_KEY IDENTITY_HMAC_KEY; do
-  if ! $NL api getEnvVar --data "{\"account_id\":\"${NETLIFY_TEAM_SLUG:-kairos-innovate}\",\"site_id\":\"$NETLIFY_SITE_ID\",\"key\":\"$k\"}" >/dev/null 2>&1; then
-    sets "$k" "$(node -e "process.stdout.write(require('crypto').randomBytes(32).toString('base64'))")"
-  else
-    echo "$k exists"
-  fi
-done
+node -e '
+  const g=()=>({value:require("crypto").randomBytes(32).toString("base64"),secret:true});
+  process.stdout.write(JSON.stringify({IDENTITY_ENCRYPTION_KEY:g(),IDENTITY_HMAC_KEY:g()}));' \
+  | node scripts/netlify-env.mjs --missing-only
 
 echo "== Build and deploy app"
 $NL deploy --build --prod --site "$NETLIFY_SITE_ID" --message "staging $(git rev-parse --short HEAD)"
