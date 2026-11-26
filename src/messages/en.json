@@ -605,6 +605,9 @@
     "offline": "You're offline. Some information may be out of date.",
     "devEnvironment": "Development environment",
     "stagingEnvironment": "Staging environment — not for real customers",
+    "identityDevFixture": "Identity: development fixtures, not Fayda",
+    "identityFaydaSandbox": "Identity: Fayda sandbox, not real verification",
+    "identityNotConfigured": "Identity: Fayda not connected (sandbox only, after partner onboarding)",
     "days": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
   },
   "legal": {

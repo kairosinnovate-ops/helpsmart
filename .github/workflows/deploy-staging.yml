@@ -1,0 +1,30 @@
+name: Deploy staging
+# Manual deploy to the staging Firebase project. Needs, in Settings > Secrets and variables > Actions:
+#   secret   FIREBASE_SERVICE_ACCOUNT_STAGING  JSON key of a service account with Owner on the staging project only
+#   variable FIREBASE_STAGING_PROJECT_ID       the staging project id
+# See docs/DEPLOYMENT.md ("Staging via GitHub Actions").
+on:
+  workflow_dispatch:
+
+concurrency: deploy-staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm --prefix functions ci
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: bash scripts/deploy-staging.sh
+        env:
+          STAGING_PROJECT_ID: ${{ vars.FIREBASE_STAGING_PROJECT_ID }}

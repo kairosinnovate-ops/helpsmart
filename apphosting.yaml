@@ -11,10 +11,12 @@ runConfig:
 env:
   - variable: APP_ENV
     value: staging            # override to "production" on the production backend
+    availability: [BUILD, RUNTIME]
   - variable: APP_BASE_URL
     value: https://REPLACE_WITH_DOMAIN
   - variable: IDENTITY_MODE
     value: disabled           # switch to fayda_oidc only after official onboarding is complete
+    availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     secret: helpsmart-web-api-key
     availability: [BUILD, RUNTIME]
@@ -26,6 +28,9 @@ env:
     availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
     value: REPLACE_WITH_PROJECT.appspot.com
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: REPLACE_WITH_SENDER_ID
     availability: [BUILD, RUNTIME]
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
     value: REPLACE_WITH_APP_ID

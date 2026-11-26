@@ -29,6 +29,20 @@ Fill in the project ids in `.firebaserc`.
 8. Deploy functions: `npm --prefix functions run build && npx firebase deploy --only functions -P staging`.
 9. Seed reference data: `GCLOUD_PROJECT=<project> npm run seed -- --project` (add `--confirm-production` for prod). Demo data can never be written outside the emulator.
 
+## Staging via GitHub Actions
+
+`.github/workflows/deploy-staging.yml` runs `scripts/deploy-staging.sh`, which does steps 4 to 9 above for staging in one go: it creates the web app, App Hosting backend (source deploys, no GitHub link) and secrets if they are missing, deploys rules, indexes, functions and the app, then seeds reference data. The identity encryption and HMAC keys are generated once inside Secret Manager and never printed.
+
+One-time setup by a project owner:
+
+1. Create the staging Firebase project on the Blaze plan. Its id must not contain `prod`.
+2. In the console: Authentication → Sign-in method → enable Email/Password. Firestore → create database (Native, `europe-west1` to match the functions region). Storage → get started.
+3. Google Cloud console → IAM → Service accounts → create `github-deploy`, grant it **Owner** on the staging project only, and create a JSON key.
+4. GitHub → Settings → Secrets and variables → Actions: add the secret `FIREBASE_SERVICE_ACCOUNT_STAGING` (the whole JSON key) and the variable `FIREBASE_STAGING_PROJECT_ID`.
+5. Actions → Deploy staging → Run workflow. The run summary prints the staging URL.
+
+Staging runs with `APP_ENV=staging` and `IDENTITY_MODE=disabled`. The banner on every page says it is staging and that Fayda is not connected. Demo providers are never written outside the emulator, so the marketplace starts empty; create test accounts by signing up. Provider approval and restricted actions stay locked until Fayda sandbox onboarding is done.
+
 ## Enabling Fayda (only after official onboarding)
 
 Use only the values NIDP issues and the official documentation. Do not guess any of them.
