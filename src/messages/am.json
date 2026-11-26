@@ -1,0 +1,64 @@
+{
+  "_note": "Draft Amharic translation. Requires review by a native speaker before launch.",
+  "brand": {
+    "tagline": "እርዳታ ያግኙ። በብልሃት ይኑሩ።",
+    "secondary": "እውነተኛ ሰዎች። የተረጋገጡ ማንነቶች። የታመኑ አገልግሎቶች።",
+    "corporate": "በኢትዮጵያ የተገነባ። ለአፍሪካ የተነደፈ።"
+  },
+  "nav": {
+    "findServices": "አገልግሎቶችን ያግኙ",
+    "howItWorks": "እንዴት ይሰራል",
+    "becomeHelper": "አገልግሎት ሰጪ ይሁኑ",
+    "about": "ስለ እኛ",
+    "login": "ይግቡ",
+    "getStarted": "ይጀምሩ",
+    "home": "መነሻ",
+    "explore": "ያስሱ",
+    "bookings": "ቀጠሮዎች",
+    "messages": "መልዕክቶች",
+    "profile": "መገለጫ",
+    "notifications": "ማሳወቂያዎች",
+    "logout": "ይውጡ",
+    "language": "ቋንቋ"
+  },
+  "landing": {
+    "heroTitle": "የታመነ እርዳታ። ብልህ ኑሮ።",
+    "heroBody": "ለቤትዎ፣ ለቤተሰብዎ እና ለንግድዎ የተረጋገጡ የአካባቢ ባለሙያዎችን በአንድ ቦታ ያግኙ።",
+    "findService": "አገልግሎት ያግኙ",
+    "becomeHelper": "አገልግሎት ሰጪ ይሁኑ",
+    "launchCity": "መጀመሪያ በአዲስ አበባ"
+  },
+  "verify": {
+    "title": "ማንነትዎን ያረጋግጡ።",
+    "body": "በኢትዮጵያ ብሔራዊ ዲጂታል መታወቂያ ስርዓት ማንነትዎን በማረጋገጥ ደህንነቱ የተጠበቀና የታመነ ማህበረሰብ እንድንገነባ ይርዱን።",
+    "cta": "በፋይዳ ይቀጥሉ",
+    "status": {
+      "unverified": "ያልተረጋገጠ",
+      "in_progress": "ማረጋገጫ በሂደት ላይ",
+      "fayda_verified": "በፋይዳ የተረጋገጠ",
+      "failed": "ማረጋገጫ አልተሳካም"
+    }
+  },
+  "home": {
+    "title": "ዛሬ በምን ልንረዳዎት እንችላለን?",
+    "body": "በአቅራቢያዎ ያሉ የታመኑ ባለሙያዎችን በፈለጉት ጊዜ ያግኙ።",
+    "search": "ጽዳት፣ የቧንቧ ስራ፣ እንክብካቤ እና ሌሎችንም ይፈልጉ"
+  },
+  "provider": {
+    "bookNow": "አሁን ይያዙ",
+    "requestQuote": "ዋጋ ይጠይቁ",
+    "message": "መልዕክት",
+    "save": "ያስቀምጡ"
+  },
+  "badges": {
+    "fayda_verified": "በፋይዳ የተረጋገጠ",
+    "helpsmart_approved": "በሄልፕስማርት የጸደቀ"
+  },
+  "common": {
+    "loading": "በመጫን ላይ…",
+    "save": "አስቀምጥ",
+    "cancel": "ሰርዝ",
+    "search": "ፈልግ",
+    "days": ["እሑድ", "ሰኞ", "ማክሰኞ", "ረቡዕ", "ሐሙስ", "ዓርብ", "ቅዳሜ"]
+  }
+}

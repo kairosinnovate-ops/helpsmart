@@ -1,0 +1,17 @@
+{
+  "name": "helpsmart-functions",
+  "private": true,
+  "main": "lib/index.js",
+  "engines": { "node": "22" },
+  "scripts": {
+    "build": "tsc -p .",
+    "serve": "npm run build && firebase emulators:start --only functions"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.5.1",
+    "firebase-functions": "^7.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

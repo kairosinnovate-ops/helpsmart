@@ -1,0 +1,45 @@
+rules_version = '2';
+
+// HelpSmart Storage rules. Deny by default.
+// Uploads go to a per-user prefix. The server checks that any path a client submits starts with
+// that user's prefix before it records the file (see src/server/services/providers.ts).
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() { return request.auth != null; }
+    function isUser(uid) { return signedIn() && request.auth.uid == uid; }
+    function adminWith(roles) { return signedIn() && request.auth.token.get('adminRole', '') in roles; }
+    function isImage() { return request.resource.contentType.matches('image/(jpeg|png|webp)'); }
+    function isDocument() { return request.resource.contentType.matches('image/(jpeg|png|webp)|application/pdf'); }
+    function under(mb) { return request.resource.size < mb * 1024 * 1024; }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // Professional credentials (certificates, licences). Private: the owner can upload and read back
+    // their own file. Only verification staff can read them. Files are never public.
+    match /credentials/{uid}/{file} {
+      // resource == null: a submitted file can never be replaced after review has started.
+      allow create: if isUser(uid) && resource == null && isDocument() && under(10);
+      allow read: if isUser(uid) || adminWith(['super_admin', 'operations_manager', 'verification_officer']);
+    }
+
+    // Provider profile and portfolio photos. Publicly readable because they are shown on approved profiles.
+    match /providers/{uid}/{file} {
+      allow create, update: if isUser(uid) && isImage() && under(5);
+      allow delete: if isUser(uid);
+      allow read: if true;
+    }
+
+    // Photos attached to service requests and bookings. Readable by the uploader. Other parties receive
+    // short-lived signed URLs from the server once they are entitled to see them.
+    match /requests/{uid}/{file} {
+      allow create: if isUser(uid) && isImage() && under(5);
+      allow read: if isUser(uid);
+    }
+    match /bookings/{uid}/{file} {
+      allow create: if isUser(uid) && isImage() && under(5);
+      allow read: if isUser(uid);
+    }
+  }
+}

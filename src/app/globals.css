@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * HelpSmart design tokens. Components use these semantic names, never raw hex values.
+ */
+@theme {
+  --color-trust: #103d35;        /* Trust Green — primary */
+  --color-trust-700: #0c2f29;
+  --color-trust-50: #e7efed;
+  --color-smart: #aeea80;        /* Smart Green — accent */
+  --color-smart-200: #d6f5bf;
+  --color-canvas: #f7f8f4;       /* Soft White — background */
+  --color-ink: #202b33;          /* Charcoal — text */
+  --color-muted: #5b6870;        /* secondary text, 5.6:1 on white */
+  --color-card: #ffffff;         /* Pure White */
+  --color-line: #e8ece9;         /* Light Gray — borders */
+  --color-success: #1f7a4d;
+  --color-success-50: #e8f5ee;
+  --color-warning: #8a5a00;
+  --color-warning-50: #fdf3dc;
+  --color-danger: #b42318;
+  --color-danger-50: #fdecea;
+  --color-info: #1d4ed8;
+  --color-info-50: #e8efff;
+
+  --font-sans: var(--font-inter), var(--font-ethiopic), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
+  --shadow-card: 0 1px 2px rgb(16 61 53 / 0.04), 0 4px 16px rgb(16 61 53 / 0.06);
+  --shadow-pop: 0 8px 30px rgb(16 61 53 / 0.14);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* Visible, consistent focus for keyboard users (WCAG 2.2 focus appearance). */
+:focus-visible {
+  outline: 3px solid var(--color-smart);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #eef1ee 25%, #f6f8f6 37%, #eef1ee 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
 }

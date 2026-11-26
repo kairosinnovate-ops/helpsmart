@@ -1,0 +1,48 @@
+rules_version = '2';
+
+// HelpSmart Firestore rules. Deny by default.
+//
+// All writes happen on the server (Next.js route handlers using the Admin SDK, which bypasses rules).
+// Clients get read access only where a realtime listener or direct read is genuinely useful, and only
+// to data the signed-in user is entitled to see. No client may write any document, which is what
+// stops users from changing their own verification status, roles, approvals, badges, ratings,
+// payment status or commissions.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isUser(uid) { return signedIn() && request.auth.uid == uid; }
+
+    // Default: deny everything.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Public, non-sensitive projections and reference data.
+    match /publicProfiles/{providerId} { allow read: if true; }
+    match /serviceCategories/{id} { allow read: if resource.data.active == true; }
+    match /geographicRegions/{id} { allow read: if resource.data.active == true; }
+    match /reviews/{id} { allow read: if resource.data.status == 'published'; }
+
+    // Owner-only reads of their own account data. Identity attributes live elsewhere and are never readable.
+    match /users/{uid} {
+      allow read: if isUser(uid);
+      match /addresses/{addressId} { allow read: if isUser(uid); }
+    }
+    match /notifications/{id} { allow read: if signedIn() && resource.data.uid == request.auth.uid; }
+    match /savedProviders/{id} { allow read: if signedIn() && resource.data.uid == request.auth.uid; }
+
+    // Conversations and messages: participants only. Used by the realtime message thread.
+    match /conversations/{convId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.participantIds;
+      match /messages/{messageId} {
+        allow read: if signedIn()
+          && request.auth.uid in get(/databases/$(database)/documents/conversations/$(convId)).data.participantIds;
+      }
+    }
+
+    // Everything else (privateIdentityRecords, identityVerificationRecords, identityVerificationSessions,
+    // identitySubjects, providerProfiles, providerApplications, professionalCredentials, providerReferences,
+    // bookings, payments, transactions, disputes, auditLogs, platformSettings, adminUsers, rateLimits, ...)
+    // falls through to the default deny and is reachable only through the server API.
+  }
+}
