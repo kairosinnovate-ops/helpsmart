@@ -1,0 +1,10 @@
+{
+  "name": "HelpSmart",
+  "short_name": "HelpSmart",
+  "description": "Find help. Live smarter. Trusted home services in Addis Ababa.",
+  "start_url": "/home",
+  "display": "standalone",
+  "background_color": "#F7F8F4",
+  "theme_color": "#103D35",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

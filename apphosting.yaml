@@ -1,0 +1,45 @@
+# Firebase App Hosting configuration (staging/production).
+# Create one backend per environment. Secrets are references to Cloud Secret Manager, never values.
+# See docs/DEPLOYMENT.md.
+runConfig:
+  minInstances: 0
+  maxInstances: 10
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 1024
+
+env:
+  - variable: APP_ENV
+    value: staging            # override to "production" on the production backend
+  - variable: APP_BASE_URL
+    value: https://REPLACE_WITH_DOMAIN
+  - variable: IDENTITY_MODE
+    value: disabled           # switch to fayda_oidc only after official onboarding is complete
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    secret: helpsmart-web-api-key
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: REPLACE_WITH_PROJECT.firebaseapp.com
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: REPLACE_WITH_PROJECT
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: REPLACE_WITH_PROJECT.appspot.com
+    availability: [BUILD, RUNTIME]
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: REPLACE_WITH_APP_ID
+    availability: [BUILD, RUNTIME]
+  - variable: IDENTITY_ENCRYPTION_KEY
+    secret: helpsmart-identity-encryption-key
+  - variable: IDENTITY_HMAC_KEY
+    secret: helpsmart-identity-hmac-key
+  # Uncomment once Fayda partner onboarding issues these values:
+  # - variable: FAYDA_ISSUER
+  #   value: <issued by NIDP>
+  # - variable: FAYDA_CLIENT_ID
+  #   secret: helpsmart-fayda-client-id
+  # - variable: FAYDA_CLIENT_PRIVATE_JWK
+  #   secret: helpsmart-fayda-client-private-jwk
+  # - variable: FAYDA_REDIRECT_URI
+  #   value: https://REPLACE_WITH_DOMAIN/api/identity/callback
