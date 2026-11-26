@@ -29,6 +29,12 @@ SDK="$($FB apps:sdkconfig WEB "$APP_ID" --json)"
 cfg() { node -e "const r=JSON.parse(process.argv[1]).result;const c=r.sdkConfig||r.fileContents&&JSON.parse(r.fileContents)||r;console.log(c[process.argv[2]]||'')" "$SDK" "$1"; }
 
 echo "== Firestore rules and indexes"
+# TTL policies need billing, so Spark skips them (CI workspace copy only). Expired rate-limit and
+# identity-session documents then stay in the database; the app already checks expiresAt when reading them.
+node -e '
+  const fs=require("fs");const f=JSON.parse(fs.readFileSync("firestore.indexes.json"));
+  f.fieldOverrides=(f.fieldOverrides||[]).filter(o=>!o.ttl);
+  fs.writeFileSync("firestore.indexes.json",JSON.stringify(f,null,2));'
 $FB deploy --only firestore
 
 echo "== Reference data"
