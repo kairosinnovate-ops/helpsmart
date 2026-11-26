@@ -7,7 +7,8 @@ import { getFirestore, type Firestore } from "firebase-admin/firestore";
  * Firebase Admin initialisation.
  * - Emulators: set FIRESTORE_EMULATOR_HOST / FIREBASE_AUTH_EMULATOR_HOST and GCLOUD_PROJECT.
  * - Firebase App Hosting / Cloud Run: Application Default Credentials, no key file.
- * - Elsewhere: FIREBASE_SERVICE_ACCOUNT_JSON from a secret manager (never committed).
+ * - Elsewhere: FIREBASE_SERVICE_ACCOUNT_JSON, or FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY (smaller, for hosts
+ *   with tight env size limits such as Netlify), from the host's secret store (never committed).
  */
 let app: App | null = null;
 let db: Firestore | null = null;
@@ -20,8 +21,12 @@ export function adminApp(): App {
   }
   const projectId = process.env.GCLOUD_PROJECT || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
   const sa = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
   if (process.env.FIRESTORE_EMULATOR_HOST || process.env.FIREBASE_AUTH_EMULATOR_HOST) {
     app = initializeApp({ projectId: projectId || "demo-helpsmart" });
+  } else if (clientEmail && privateKey && projectId) {
+    app = initializeApp({ credential: cert({ projectId, clientEmail, privateKey }), projectId });
   } else if (sa) {
     app = initializeApp({ credential: cert(JSON.parse(sa)), projectId });
   } else {

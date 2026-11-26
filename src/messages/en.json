@@ -606,6 +606,8 @@
     "devEnvironment": "Development environment",
     "stagingEnvironment": "Staging environment — not for real customers",
     "identityDevFixture": "Identity: development fixtures, not Fayda",
+    "uploadsUnavailable": "File uploads are turned off on this staging environment. You can continue without adding documents.",
+    "reducedStaging": "Uploads and push notifications are off",
     "identityFaydaSandbox": "Identity: Fayda sandbox, not real verification",
     "identityNotConfigured": "Identity: Fayda not connected (sandbox only, after partner onboarding)",
     "days": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]

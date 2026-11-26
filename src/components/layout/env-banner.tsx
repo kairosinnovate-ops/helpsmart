@@ -15,6 +15,7 @@ export async function EnvBanner() {
   return (
     <div className="bg-warning-50 px-4 py-1.5 text-center text-xs font-semibold text-warning" role="note">
       {label} · {identity}
+      {process.env.NEXT_PUBLIC_UPLOADS_ENABLED === "false" && <> · {t("common.reducedStaging")}</>}
     </div>
   );
 }
