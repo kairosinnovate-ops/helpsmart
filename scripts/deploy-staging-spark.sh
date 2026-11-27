@@ -54,7 +54,7 @@ node -e '
   const k=JSON.parse(require("fs").readFileSync(process.env.KEY_FILE,"utf8"));
   const v=(value,secret=false)=>({value,secret});
   process.stdout.write(JSON.stringify({
-    APP_ENV:v("staging"),IDENTITY_MODE:v("disabled"),APP_BASE_URL:v(process.env.SITE_URL),GCLOUD_PROJECT:v(process.env.P),
+    AWS_LAMBDA_JS_RUNTIME:v("nodejs22.x"),APP_ENV:v("staging"),IDENTITY_MODE:v("disabled"),APP_BASE_URL:v(process.env.SITE_URL),GCLOUD_PROJECT:v(process.env.P),
     NEXT_PUBLIC_UPLOADS_ENABLED:v("false"),NEXT_PUBLIC_FIREBASE_API_KEY:v(c.apiKey),NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:v(c.authDomain),
     NEXT_PUBLIC_FIREBASE_PROJECT_ID:v(process.env.P),NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET:v(c.storageBucket||""),
     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:v(c.messagingSenderId||""),NEXT_PUBLIC_FIREBASE_APP_ID:v(process.env.APP_ID),
@@ -67,7 +67,7 @@ node -e '
   | node scripts/netlify-env.mjs --missing-only
 
 echo "== Build and deploy app"
-$NL deploy --build --prod --site "$NETLIFY_SITE_ID" --message "staging $(git rev-parse --short HEAD)"
+$NL deploy --build --prod --skip-functions-cache --site "$NETLIFY_SITE_ID" --message "staging $(git rev-parse --short HEAD)"
 
 echo
 echo "Staging is live at $SITE_URL"
