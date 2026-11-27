@@ -1,0 +1,49 @@
+name: Deploy staging
+# Manual deploy to staging. Needs, in Settings > Secrets and variables > Actions:
+#   secret   FIREBASE_SERVICE_ACCOUNT_STAGING  JSON key of a service account on the staging project only
+#   variable FIREBASE_STAGING_PROJECT_ID       the staging project id
+#   secret   NETLIFY_AUTH_TOKEN                Netlify personal access token (Spark plan only)
+# See docs/DEPLOYMENT.md ("Staging via GitHub Actions").
+on:
+  workflow_dispatch:
+    inputs:
+      plan:
+        description: "spark = Auth + Firestore on Firebase, app on Netlify. blaze = everything on Firebase."
+        type: choice
+        options: [spark, blaze]
+        default: spark
+  # Until this workflow is on main (where "Run workflow" appears), pushes to the staging PR branch deploy with plan=spark.
+  push:
+    branches: [claude/project-thread-9d1m1d]
+
+concurrency: deploy-staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm --prefix functions ci
+        if: (inputs.plan || 'spark') == 'blaze'
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAGING }}
+      - uses: google-github-actions/setup-gcloud@v2
+        if: (inputs.plan || 'spark') == 'blaze'
+      - run: bash scripts/deploy-staging-spark.sh
+        if: (inputs.plan || 'spark') == 'spark'
+        env:
+          STAGING_PROJECT_ID: ${{ vars.FIREBASE_STAGING_PROJECT_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: 6f14a135-778c-427c-9475-6ba4ddee0475
+      - run: bash scripts/deploy-staging.sh
+        if: (inputs.plan || 'spark') == 'blaze'
+        env:
+          STAGING_PROJECT_ID: ${{ vars.FIREBASE_STAGING_PROJECT_ID }}

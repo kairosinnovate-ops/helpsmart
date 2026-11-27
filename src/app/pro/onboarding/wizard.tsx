@@ -12,6 +12,9 @@ import { RegionPicker, type RegionOption } from "@/components/forms/region-picke
 import { Alert, Button, ButtonLink, Card, Checkbox, Field, Input, Pill, Select, Textarea } from "@/components/ui";
 import type { ProviderWorkspace } from "@/server/services/providers";
 
+/** Off on reduced staging (Firebase Spark has no Storage bucket). */
+const UPLOADS_ENABLED = process.env.NEXT_PUBLIC_UPLOADS_ENABLED !== "false";
+
 const STEPS = ["identity", "profile", "categories", "qualifications", "area", "pricing", "availability", "review"] as const;
 type Step = (typeof STEPS)[number];
 
@@ -124,7 +127,7 @@ export function Wizard({ uid, initialStep, verified, identityStatus, workspace, 
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-ink">{t("pro.credentials")}</h2>
               {workspace.credentials.length > 0 && <ul className="divide-y divide-line rounded-xl border border-line">{workspace.credentials.map((c) => <li key={c.id} className="flex items-center justify-between p-3 text-sm"><span>{c.title} · {t(`pro.credentialTypes.${c.type}`)}</span><Pill tone={c.status === "verified" ? "green" : c.status === "rejected" ? "red" : "amber"}>{c.status === "verified" ? t("pro.statusVerified") : c.status === "rejected" ? t("pro.statusRejected") : t("pro.statusPending")}</Pill></li>)}</ul>}
-              <form className="space-y-4 rounded-xl bg-canvas p-4" onSubmit={async (e) => {
+              {!UPLOADS_ENABLED ? <Alert tone="warning">{t("common.uploadsUnavailable")}</Alert> : <form className="space-y-4 rounded-xl bg-canvas p-4" onSubmit={async (e) => {
                 e.preventDefault();
                 setUploadErr(null);
                 if (!cred.file) return;
@@ -145,7 +148,7 @@ export function Wizard({ uid, initialStep, verified, identityStatus, workspace, 
                 <Field label={t("pro.upload")} htmlFor="c-file" hint={t("pro.uploadHint")}><input id="c-file" type="file" accept="application/pdf,image/jpeg,image/png" onChange={(e) => setCred({ ...cred, file: e.target.files?.[0] ?? null })} className="block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-trust file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white" required /></Field>
                 {uploadErr && <Alert tone="danger">{uploadErr}</Alert>}
                 <Button type="submit" variant="secondary" loading={busy} disabled={locked}><Upload className="size-4" /> {t("pro.add")}</Button>
-              </form>
+              </form>}
             </div>
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-ink">{t("pro.references")}</h2>

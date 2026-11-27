@@ -46,3 +46,6 @@ next-env.d.ts
 *-debug.log
 firebase-export-*/
 functions/lib/
+
+# netlify
+.netlify

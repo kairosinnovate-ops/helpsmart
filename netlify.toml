@@ -1,0 +1,8 @@
+# Reduced staging on Netlify (Firebase Spark). Environment values are set by scripts/deploy-staging-spark.sh,
+# never in this file. Next.js is detected and runs through Netlify's Next.js runtime.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
