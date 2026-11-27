@@ -20,7 +20,11 @@ case "$P" in
 esac
 
 echo "== Web app config"
-APP_ID="$($FB apps:list WEB --json | node -e 'const r=JSON.parse(require("fs").readFileSync(0)).result||[];const a=r.find(x=>x.displayName==="helpsmart-staging-web")||r[0];if(a)console.log(a.appId)')"
+if ! APPS="$($FB apps:list WEB --json)"; then
+  echo "firebase apps:list failed: $(node -e 'try{console.log(JSON.parse(process.argv[1]).error)}catch{console.log("no JSON output")}' "$APPS")" >&2
+  exit 1
+fi
+APP_ID="$(printf %s "$APPS" | node -e 'const r=JSON.parse(require("fs").readFileSync(0)).result||[];const a=r.find(x=>x.displayName==="helpsmart-staging-web")||r[0];if(a)console.log(a.appId)')"
 if [ -z "$APP_ID" ]; then
   $FB apps:create WEB helpsmart-staging-web >/dev/null
   APP_ID="$($FB apps:list WEB --json | node -e 'console.log(JSON.parse(require("fs").readFileSync(0)).result[0].appId)')"
